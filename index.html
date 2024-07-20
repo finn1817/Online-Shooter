@@ -39,6 +39,17 @@
             text-align: center;
             display: none;
         }
+        #howToPlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
         button {
             background-color: #4CAF50;
             border: none;
@@ -69,6 +80,14 @@
             Level Up!<br>
             <button id="nextLevelButton">Next Level</button>
         </div>
+        <div id="howToPlay">
+            <h2>How to Play</h2>
+            <p>Use arrow keys to move your ship.</p>
+            <p>Click to shoot at enemies.</p>
+            <p>Collect power-ups to gain advantages.</p>
+            <p>Survive as long as possible and increase your score!</p>
+            <button id="startButton">Start Game</button>
+        </div>
     </div>
 
     <script>
@@ -84,10 +103,13 @@
         const levelUpElement = document.getElementById('levelUp');
         const restartButton = document.getElementById('restartButton');
         const nextLevelButton = document.getElementById('nextLevelButton');
+        const howToPlayElement = document.getElementById('howToPlay');
+        const startButton = document.getElementById('startButton');
 
         let player, bullets, enemies, particles, powerUps;
         let score, level, lives, gameLoop, spawnLoop;
         let gameActive = false;
+        let gameStarted = false;
 
         class Entity {
             constructor(x, y, radius, color) {
@@ -184,6 +206,11 @@
         const keys = {};
 
         function initGame() {
+            if (!gameStarted) {
+                howToPlayElement.style.display = 'none';
+                gameStarted = true;
+            }
+
             player = new Player(canvas.width / 2, canvas.height - 50, 15, 'white');
             bullets = [];
             enemies = [];
@@ -371,11 +398,15 @@
         }
 
         function shootBullet(event) {
-            if (!gameActive) return;
+            if (!gameActive || !gameStarted) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
 
             const angle = Math.atan2(
-                event.clientY - player.y,
-                event.clientX - player.x
+                y - player.y,
+                x - player.x
             );
             const velocity = {
                 x: Math.cos(angle) * 5,
@@ -408,7 +439,7 @@
             spawnLoop = setInterval(spawnEnemies, 1000);
         });
 
-        initGame();
+        startButton.addEventListener('click', initGame);
     </script>
 </body>
 </html>
